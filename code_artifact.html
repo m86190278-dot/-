@@ -1,0 +1,1700 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>منصة الدحيح — ذاكر بذكاء ونظّم يومك</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdfa',
+              100: '#ccfbf1',
+              200: '#99f6e4',
+              500: '#14b8a6',
+              600: '#0d9488',
+              700: '#0f766e',
+              800: '#115e59',
+              900: '#134e4a',
+            }
+          },
+          fontFamily: {
+            cairo: ['Cairo', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Google Font: Cairo -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    .modal-backdrop {
+      background-color: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(4px);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-50 text-slate-800 antialiased selection:bg-brand-500 selection:text-white">
+
+  <!-- Header / Navigation -->
+  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Brand Logo & Name -->
+      <div class="flex items-center gap-3 cursor-pointer" onclick="navigateTo('home')">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-700 to-brand-500 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+          </svg>
+        </div>
+        <span class="font-extrabold text-xl tracking-tight bg-gradient-to-r from-brand-800 to-brand-600 bg-clip-text text-transparent">
+          الدحيح
+        </span>
+      </div>
+
+      <!-- Public Nav Links -->
+      <nav id="publicNav" class="hidden md:flex items-center gap-6">
+        <button onclick="navigateTo('home')" class="nav-btn font-semibold text-slate-600 hover:text-brand-600 transition">الرئيسية</button>
+        <button onclick="scrollToFeatures()" class="nav-btn font-semibold text-slate-600 hover:text-brand-600 transition">المميزات</button>
+        <button onclick="navigateTo('login')" class="nav-btn font-semibold text-slate-600 hover:text-brand-600 transition">تسجيل الدخول</button>
+        <button onclick="navigateTo('register')" class="px-4 py-2 rounded-xl bg-brand-600 text-white font-bold hover:bg-brand-700 transition shadow-md shadow-brand-600/20">إنشاء حساب</button>
+      </nav>
+
+      <!-- User Nav Actions (When Logged In) -->
+      <div id="userNavActions" class="hidden flex items-center gap-3">
+        <span id="navUserName" class="hidden sm:inline font-bold text-slate-700 text-sm"></span>
+        <button onclick="navigateTo('dashboard')" class="px-3.5 py-1.5 rounded-xl bg-brand-50 text-brand-700 font-bold hover:bg-brand-100 transition text-sm">لوحة التحكم</button>
+        <button onclick="handleLogout()" class="px-3.5 py-1.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 transition text-sm">خروج</button>
+      </div>
+
+      <!-- Mobile Menu Toggle Button -->
+      <button id="mobileMenuBtn" onclick="toggleMobileNav()" class="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100">
+        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+
+    </div>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobileMenu" class="hidden md:hidden border-t border-slate-100 bg-white px-4 py-4 space-y-3">
+      <div id="mobilePublicLinks" class="flex flex-col space-y-2">
+        <button onclick="navigateTo('home'); toggleMobileNav()" class="text-right py-2 font-semibold text-slate-700 hover:text-brand-600">الرئيسية</button>
+        <button onclick="navigateTo('login'); toggleMobileNav()" class="text-right py-2 font-semibold text-slate-700 hover:text-brand-600">تسجيل الدخول</button>
+        <button onclick="navigateTo('register'); toggleMobileNav()" class="text-center py-2 bg-brand-600 text-white rounded-xl font-bold">إنشاء حساب جديد</button>
+      </div>
+      <div id="mobileUserLinks" class="hidden flex flex-col space-y-2">
+        <div id="mobileUserName" class="font-bold text-brand-800 pb-2 border-b border-slate-100"></div>
+        <button onclick="navigateTo('dashboard'); toggleMobileNav()" class="text-right py-2 font-semibold text-slate-700">لوحة التحكم</button>
+        <button onclick="navigateTo('subjects'); toggleMobileNav()" class="text-right py-2 font-semibold text-slate-700">المواد الدراسية</button>
+        <button onclick="navigateTo('tasks'); toggleMobileNav()" class="text-right py-2 font-semibold text-slate-700">المهام والواجبات</button>
+        <button onclick="navigateTo('schedule'); toggleMobileNav()" class="text-right py-2 font-semibold text-slate-700">جدول المذاكرة</button>
+        <button onclick="navigateTo('calendar'); toggleMobileNav()" class="text-right py-2 font-semibold text-slate-700">التقويم الدراسي</button>
+        <button onclick="navigateTo('ai-assistant'); toggleMobileNav()" class="text-right py-2 font-semibold text-brand-700 bg-brand-50 px-2 rounded-lg">🤖 مساعد AI</button>
+        <button onclick="navigateTo('settings'); toggleMobileNav()" class="text-right py-2 font-semibold text-slate-700">الإعدادات</button>
+        <button onclick="handleLogout(); toggleMobileNav()" class="text-right py-2 font-bold text-rose-600">تسجيل الخروج</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Dynamic View Container -->
+  <main id="app" class="flex-1">
+    <!-- View content loaded dynamically via JavaScript -->
+  </main>
+
+  <!-- Global Footer -->
+  <footer class="bg-slate-900 text-slate-400 border-t border-slate-800 py-10 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div>
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center text-white">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+            </svg>
+          </div>
+          <span class="font-extrabold text-xl text-white">الدحيح</span>
+        </div>
+        <p class="text-sm leading-relaxed text-slate-400">منصة تنظيم المذاكرة الأولى للطلاب في العالم العربي. خطط لموادك وواجباتك واستغل وقتك بذكاء.</p>
+      </div>
+
+      <div>
+        <h4 class="font-bold text-white mb-3">روابط سريعة</h4>
+        <ul class="space-y-2 text-sm">
+          <li><button onclick="navigateTo('home')" class="hover:text-white transition">الصفحة الرئيسية</button></li>
+          <li><button onclick="navigateTo('dashboard')" class="hover:text-white transition">لوحة التحكم</button></li>
+          <li><button onclick="navigateTo('subjects')" class="hover:text-white transition">إدارة المواد</button></li>
+          <li><button onclick="navigateTo('tasks')" class="hover:text-white transition">جدول الواجبات</button></li>
+          <li><button onclick="navigateTo('ai-assistant')" class="hover:text-white transition">مساعد AI</button></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="font-bold text-white mb-3">معلومات التخزين</h4>
+        <p class="text-xs text-slate-400 leading-relaxed mb-3">هذا التطبيق يعمل بالكامل في وضع الصفحة الواحدة وتخزين البيانات محليًا داخل متصفحك (localStorage). بياناتك محفوظة بأمان وخاصة بك تمامًا.</p>
+        <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-800 text-brand-400 border border-slate-700">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          بيانات خاصة وخالية من العينات
+        </span>
+      </div>
+    </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 mt-8 border-t border-slate-800 text-center text-xs text-slate-500">
+      جميع الحقوق محفوظة &copy; <span id="currentYear"></span> منصة الدحيح.
+    </div>
+  </footer>
+
+  <!-- Toast Container -->
+  <div id="toastWrap" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
+
+  <!-- Dynamic Modal Overlay Container -->
+  <div id="modalWrap" class="hidden fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-4 overflow-y-auto"></div>
+
+  <!-- JavaScript Application Logic -->
+  <script>
+    /* =========================================================
+       State Management & Data Persistence (localStorage)
+       ========================================================= */
+    const DB_KEY = 'eldaheeh_app_database_v3';
+    
+    // Completely empty DB schema for new students
+    let DB = {
+      user: null, // { name, email, demoMode }
+      subjects: [],
+      tasks: [],
+      sessions: [],
+      events: [],
+      settings: {
+        studyHours: 3
+      }
+    };
+
+    // Load data from localStorage
+    function loadDB() {
+      try {
+        const data = localStorage.getItem(DB_KEY);
+        if (data) {
+          const parsed = JSON.parse(data);
+          DB = Object.assign(DB, parsed);
+        }
+      } catch (err) {
+        console.error('Error loading database:', err);
+      }
+    }
+
+    // Save current DB state to localStorage
+    function saveDB() {
+      try {
+        localStorage.setItem(DB_KEY, JSON.stringify(DB));
+      } catch (err) {
+        toast('خطأ في حفظ البيانات محليًا', 'error');
+      }
+    }
+
+    // Utility Helpers
+    const uid = () => 'id-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    const getTodayISO = () => new Date().toISOString().slice(0, 10);
+    const escapeHTML = str => String(str ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    const AR_DAYS = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+    const AR_MONTHS = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+
+    function formatDateAr(iso) {
+      if (!iso) return '';
+      const d = new Date(iso + 'T00:00:00');
+      return `${AR_DAYS[d.getDay()]} ${d.getDate()} ${AR_MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+    }
+
+    function formatShortDate(iso) {
+      if (!iso) return '';
+      const d = new Date(iso + 'T00:00:00');
+      return `${d.getDate()} ${AR_MONTHS[d.getMonth()]}`;
+    }
+
+    function getSubject(id) {
+      return DB.subjects.find(s => s.id === id) || { name: 'بدون مادة', color: '#64748b' };
+    }
+
+    /* =========================================================
+       UI Notifications (Toasts) & Modals
+       ========================================================= */
+    function toast(message, type = 'success') {
+      const wrap = document.getElementById('toastWrap');
+      const el = document.createElement('div');
+      
+      const isSuccess = type === 'success';
+      const bgColor = isSuccess ? 'bg-emerald-600' : 'bg-rose-600';
+      
+      el.className = `pointer-events-auto flex items-center justify-between gap-3 text-white px-4 py-3 rounded-xl shadow-lg ${bgColor} transition-all duration-300 transform translate-y-2 opacity-0`;
+      el.innerHTML = `
+        <div class="flex items-center gap-2 text-sm font-bold">
+          <span>${isSuccess ? '✅' : '⚠️'}</span>
+          <span>${escapeHTML(message)}</span>
+        </div>
+      `;
+
+      wrap.appendChild(el);
+      setTimeout(() => {
+        el.classList.remove('translate-y-2', 'opacity-0');
+      }, 10);
+
+      setTimeout(() => {
+        el.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => el.remove(), 300);
+      }, 3000);
+    }
+
+    function openModal(title, bodyHTML, onSubmit, options = {}) {
+      const wrap = document.getElementById('modalWrap');
+      const danger = options.danger || false;
+      const okText = options.okText || 'حفظ';
+
+      wrap.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 sm:p-7 relative border border-slate-100 transform transition-all scale-95" onclick="event.stopPropagation()">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-5">
+            <h3 class="text-xl font-bold text-slate-800">${escapeHTML(title)}</h3>
+            <button type="button" onclick="closeModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+          
+          <form id="activeModalForm" novalidate>
+            <div class="space-y-4 max-h-[70vh] overflow-y-auto px-1">
+              ${bodyHTML}
+            </div>
+            
+            <div class="flex items-center justify-end gap-3 border-t border-slate-100 pt-5 mt-6">
+              <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold text-sm transition">إلغاء</button>
+              <button type="submit" class="px-5 py-2 rounded-xl text-white font-bold text-sm transition shadow-md ${danger ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-600/20' : 'bg-brand-600 hover:bg-brand-700 shadow-brand-600/20'}">
+                ${escapeHTML(okText)}
+              </button>
+            </div>
+          </form>
+        </div>
+      `;
+
+      wrap.classList.remove('hidden');
+      setTimeout(() => {
+        wrap.firstElementChild?.classList.remove('scale-95');
+      }, 10);
+
+      document.getElementById('activeModalForm').onsubmit = (e) => {
+        e.preventDefault();
+        const success = onSubmit();
+        if (success !== false) {
+          closeModal();
+        }
+      };
+    }
+
+    function closeModal() {
+      const wrap = document.getElementById('modalWrap');
+      wrap.classList.add('hidden');
+      wrap.innerHTML = '';
+    }
+
+    function confirmModal(message, onConfirm) {
+      openModal('تأكيد الإجراء', `<p class="text-slate-600 font-medium text-base leading-relaxed">${escapeHTML(message)}</p>`, () => {
+        onConfirm();
+        return true;
+      }, { okText: 'نعم، متابعة', danger: true });
+    }
+
+    /* =========================================================
+       Router & View Controller
+       ========================================================= */
+    let currentView = 'home';
+
+    function navigateTo(viewName) {
+      const protectedViews = ['dashboard', 'subjects', 'tasks', 'schedule', 'calendar', 'ai-assistant', 'settings'];
+      
+      // Auth Guard
+      if (protectedViews.includes(viewName) && !DB.user) {
+        toast('يرجى تسجيل الدخول أولاً للوصول للوحة التحكم', 'error');
+        viewName = 'login';
+      }
+
+      // If user is logged in & tries to open auth pages
+      if ((viewName === 'login' || viewName === 'register') && DB.user) {
+        viewName = 'dashboard';
+      }
+
+      currentView = viewName;
+      updateHeaderState();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const app = document.getElementById('app');
+      
+      switch (viewName) {
+        case 'home': renderHomeView(app); break;
+        case 'login': renderLoginView(app); break;
+        case 'register': renderRegisterView(app); break;
+        case 'dashboard': renderDashboardView(app); break;
+        case 'subjects': renderSubjectsView(app); break;
+        case 'tasks': renderTasksView(app); break;
+        case 'schedule': renderScheduleView(app); break;
+        case 'calendar': renderCalendarView(app); break;
+        case 'ai-assistant': renderAIAssistantView(app); break;
+        case 'settings': renderSettingsView(app); break;
+        default: renderHomeView(app); break;
+      }
+    }
+
+    function updateHeaderState() {
+      const publicNav = document.getElementById('publicNav');
+      const userNavActions = document.getElementById('userNavActions');
+      const navUserName = document.getElementById('navUserName');
+      
+      const mobilePublicLinks = document.getElementById('mobilePublicLinks');
+      const mobileUserLinks = document.getElementById('mobileUserLinks');
+      const mobileUserName = document.getElementById('mobileUserName');
+
+      if (DB.user) {
+        publicNav.classList.add('hidden');
+        userNavActions.classList.remove('hidden');
+        navUserName.textContent = `مرحباً، ${DB.user.name}`;
+
+        mobilePublicLinks.classList.add('hidden');
+        mobileUserLinks.classList.remove('hidden');
+        mobileUserName.textContent = `مرحباً، ${DB.user.name}`;
+      } else {
+        publicNav.classList.remove('hidden');
+        userNavActions.classList.add('hidden');
+
+        mobilePublicLinks.classList.remove('hidden');
+        mobileUserLinks.classList.add('hidden');
+      }
+    }
+
+    function toggleMobileNav() {
+      const menu = document.getElementById('mobileMenu');
+      menu.classList.toggle('hidden');
+    }
+
+    function scrollToFeatures() {
+      if (currentView !== 'home') {
+        navigateTo('home');
+        setTimeout(() => {
+          document.getElementById('featuresSection')?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      } else {
+        document.getElementById('featuresSection')?.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    function handleLogout() {
+      confirmModal('هل أنت تأكد من تسجيل الخروج من تطبيق الدحيح؟', () => {
+        DB.user = null;
+        saveDB();
+        toast('تم تسجيل الخروج بنجاح');
+        navigateTo('home');
+      });
+    }
+
+    /* =========================================================
+       App Layout Wrappers
+       ========================================================= */
+    function renderAppShell(contentHTML) {
+      return `
+        <div class="min-h-[calc(100vh-4rem)] flex flex-col md:flex-row bg-slate-50">
+          <!-- Sidebar Nav (Desktop) -->
+          <aside class="hidden md:flex flex-col w-64 bg-white border-l border-slate-200 p-4 space-y-1 sticky top-16 h-[calc(100vh-4rem)]">
+            <div class="px-3 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">قائمة المذاكرة</div>
+            
+            <button onclick="navigateTo('dashboard')" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition ${currentView === 'dashboard' ? 'bg-brand-600 text-white shadow-md shadow-brand-600/20' : 'text-slate-600 hover:bg-slate-100'}">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 00-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+              <span>الرئيسية (Dashboard)</span>
+            </button>
+
+            <button onclick="navigateTo('subjects')" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition ${currentView === 'subjects' ? 'bg-brand-600 text-white shadow-md shadow-brand-600/20' : 'text-slate-600 hover:bg-slate-100'}">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+              <span>المواد الدراسية</span>
+            </button>
+
+            <button onclick="navigateTo('tasks')" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition ${currentView === 'tasks' ? 'bg-brand-600 text-white shadow-md shadow-brand-600/20' : 'text-slate-600 hover:bg-slate-100'}">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+              <span>المهام والواجبات</span>
+            </button>
+
+            <button onclick="navigateTo('schedule')" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition ${currentView === 'schedule' ? 'bg-brand-600 text-white shadow-md shadow-brand-600/20' : 'text-slate-600 hover:bg-slate-100'}">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span>جدول المذاكرة</span>
+            </button>
+
+            <button onclick="navigateTo('calendar')" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition ${currentView === 'calendar' ? 'bg-brand-600 text-white shadow-md shadow-brand-600/20' : 'text-slate-600 hover:bg-slate-100'}">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <span>التقويم الدراسي</span>
+            </button>
+
+            <button onclick="navigateTo('ai-assistant')" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition ${currentView === 'ai-assistant' ? 'bg-gradient-to-r from-brand-600 to-emerald-600 text-white shadow-md' : 'text-brand-700 bg-brand-50/70 hover:bg-brand-100'}">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              <span>مساعد AI</span>
+            </button>
+
+            <button onclick="navigateTo('settings')" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-sm transition ${currentView === 'settings' ? 'bg-brand-600 text-white shadow-md shadow-brand-600/20' : 'text-slate-600 hover:bg-slate-100'}">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              <span>الإعدادات</span>
+            </button>
+
+            <div class="pt-4 mt-auto border-t border-slate-100">
+              <div class="bg-slate-100 text-slate-600 rounded-xl p-3 text-xs leading-relaxed">
+                <span class="font-bold block mb-0.5">🌱 مساحة جديدة فاضية</span>
+                ابدأ بإضافة أول مادة لك الآن.
+              </div>
+            </div>
+          </aside>
+
+          <!-- Main Content View Area -->
+          <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
+            ${contentHTML}
+          </main>
+        </div>
+      `;
+    }
+
+    /* =========================================================
+       1. View: Landing / Home Page
+       ========================================================= */
+    function renderHomeView(container) {
+      container.innerHTML = `
+        <!-- Hero Section -->
+        <section class="relative overflow-hidden pt-12 pb-20 bg-gradient-to-b from-brand-50/50 to-slate-50">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            
+            <div class="space-y-6 text-center lg:text-right">
+              <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-100 text-brand-800 text-xs font-bold">
+                ✨ المنصة الأولى لتنظيم وقت الدراسة بذكاء
+              </span>
+              <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 leading-tight">
+                ذاكر بذكاء ونظّم يومك مع <span class="bg-gradient-to-r from-brand-700 to-brand-500 bg-clip-text text-transparent">الدحيح</span>
+              </h1>
+              <p class="text-lg text-slate-600 max-w-xl leading-relaxed mx-auto lg:mx-0">
+                منصة متكاملة تُساعدك على متابعة موادك الدراسية، تسليم واجباتك في موعدها، والتخطيط لجدول مذاكرة أسبوعي يضمن لك التفوق بدون تشتت.
+              </p>
+              
+              <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
+                <button onclick="navigateTo('register')" class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-base shadow-xl shadow-brand-600/30 transition transform hover:-translate-y-0.5">
+                  ابدأ تنظيم مذاكرتك مجاناً
+                </button>
+                <button onclick="scrollToFeatures()" class="w-full sm:w-auto px-7 py-4 rounded-2xl border-2 border-slate-200 hover:border-slate-300 text-slate-700 font-bold text-base transition">
+                  استكشف المميزات
+                </button>
+              </div>
+
+              <div class="flex items-center justify-center lg:justify-start gap-6 pt-4 text-xs font-bold text-slate-500">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-emerald-500">✓</span> بدون تسجيل تعقيدي
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-emerald-500">✓</span> حفظ تلقائي للبيانات
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-emerald-500">✓</span> متوافق مع كافة الأجهزة
+                </div>
+              </div>
+            </div>
+
+            <!-- Hero Graphic Illustration Card -->
+            <div class="relative">
+              <div class="absolute inset-0 bg-gradient-to-tr from-brand-400 to-emerald-300 rounded-3xl blur-2xl opacity-20 transform rotate-2"></div>
+              <div class="relative bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-100 space-y-4">
+                <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                  <div class="flex items-center gap-3">
+                    <div class="w-3 h-3 rounded-full bg-rose-400"></div>
+                    <div class="w-3 h-3 rounded-full bg-amber-400"></div>
+                    <div class="w-3 h-3 rounded-full bg-emerald-400"></div>
+                  </div>
+                  <span class="text-xs font-bold text-slate-400">لوحة تحكم طالب متفوق 🏆</span>
+                </div>
+
+                <div class="space-y-3">
+                  <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                      <span class="w-3 h-3 rounded-full bg-brand-500"></span>
+                      <div>
+                        <div class="font-bold text-slate-800 text-sm">مساحة خاصة ونظيفة 📚</div>
+                        <div class="text-xs text-slate-500">تضيف موادك ومهامك بنفسك</div>
+                      </div>
+                    </div>
+                    <span class="text-xs font-bold px-2.5 py-1 rounded-full bg-brand-100 text-brand-800">تخزين محلي</span>
+                  </div>
+
+                  <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                      <span class="w-3 h-3 rounded-full bg-indigo-500"></span>
+                      <div>
+                        <div class="font-bold text-slate-800 text-sm">🤖 مساعد ذكاء اصطناعي</div>
+                        <div class="text-xs text-slate-500">يجيب على استفسارات المنصة</div>
+                      </div>
+                    </div>
+                    <span class="text-xs font-bold px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-800">مساعد الدحيح</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="featuresSection" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="text-center max-w-2xl mx-auto mb-12">
+            <h2 class="text-3xl font-black text-slate-900">كل ما تحتاجه للتفوق الدراسي</h2>
+            <p class="text-slate-600 mt-2 font-medium">أدوات متكاملة صُممت خصيصاً لتلبي احتياجات الطالب العربي بأسلوب سلس وبسيط.</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition">
+              <div class="w-12 h-12 rounded-xl bg-brand-100 text-brand-700 flex items-center justify-center font-bold text-xl mb-4">📚</div>
+              <h3 class="text-xl font-bold text-slate-800 mb-2">إدارة المواد الدراسية</h3>
+              <p class="text-slate-600 text-sm leading-relaxed">أضف موادك ومحاضراتك، حدد لون كل مادة، ودون الملاحظات الهامة الخاصة بكل مقرر.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition">
+              <div class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-xl mb-4">✅</div>
+              <h3 class="text-xl font-bold text-slate-800 mb-2">متابعة المهام والواجبات</h3>
+              <p class="text-slate-600 text-sm leading-relaxed">نظّم الواجبات حسب الأولويات ومواعيد التسليم، وتلقى تنبيهات فورية للمهام المتأخرة.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition">
+              <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xl mb-4">🤖</div>
+              <h3 class="text-xl font-bold text-slate-800 mb-2">مساعد الدحيح الذكي</h3>
+              <p class="text-slate-600 text-sm leading-relaxed">استفسر عن أي ميزة أو كيفية تنظيم جدولك وسيساعدك موجه منصة الدحيح فوراً.</p>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    /* =========================================================
+       2. View: Login & Register
+       ========================================================= */
+    function renderLoginView(container) {
+      container.innerHTML = `
+        <div class="min-h-[calc(100vh-10rem)] flex items-center justify-center py-12 px-4">
+          <div class="max-w-md w-full bg-white rounded-3xl shadow-xl border border-slate-100 p-8">
+            <div class="text-center mb-6">
+              <h2 class="text-2xl font-black text-slate-900">تسجيل الدخول إلى الدحيح</h2>
+              <p class="text-slate-500 text-sm mt-1">أدخل بيانات حسابك للمتابعة</p>
+            </div>
+
+            <form id="loginForm" class="space-y-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">البريد الإلكتروني</label>
+                <input type="email" id="loginEmail" required placeholder="example@domain.com" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition text-sm">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">كلمة المرور</label>
+                <input type="password" id="loginPass" required placeholder="••••••••" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition text-sm">
+              </div>
+
+              <button type="submit" class="w-full py-3.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm transition shadow-lg shadow-brand-600/20">
+                تسجيل الدخول
+              </button>
+            </form>
+
+            <div class="relative my-6 text-center">
+              <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
+              <span class="relative bg-white px-3 text-xs font-bold text-slate-400">أو</span>
+            </div>
+
+            <button onclick="quickDemoLogin()" class="w-full py-3 rounded-xl border-2 border-brand-200 bg-brand-50 hover:bg-brand-100 text-brand-800 font-bold text-sm transition">
+              ⚡ الدخول السريع بالحساب التجريبي
+            </button>
+
+            <p class="text-center text-xs text-slate-500 mt-6">
+              ليس لديك حساب بعد؟ <button onclick="navigateTo('register')" class="text-brand-600 font-bold hover:underline">إنشاء حساب جديد</button>
+            </p>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('loginForm').onsubmit = (e) => {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value.trim();
+        const name = email.split('@')[0] || 'طالب دحيح';
+        
+        DB.user = { name: name, email: email, demoMode: false };
+        saveDB();
+        toast(`أهلاً بك مجدداً ${name}!`);
+        navigateTo('dashboard');
+      };
+    }
+
+    function renderRegisterView(container) {
+      container.innerHTML = `
+        <div class="min-h-[calc(100vh-10rem)] flex items-center justify-center py-12 px-4">
+          <div class="max-w-md w-full bg-white rounded-3xl shadow-xl border border-slate-100 p-8">
+            <div class="text-center mb-6">
+              <h2 class="text-2xl font-black text-slate-900">إنشاء حساب جديد</h2>
+              <p class="text-slate-500 text-sm mt-1">ابدأ تنظيم وقتك ومذاكرتك اليوم</p>
+            </div>
+
+            <form id="registerForm" class="space-y-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">الاسم الكامل</label>
+                <input type="text" id="regName" required placeholder="أحمد محمد" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition text-sm">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">البريد الإلكتروني</label>
+                <input type="email" id="regEmail" required placeholder="example@domain.com" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition text-sm">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">كلمة المرور</label>
+                <input type="password" id="regPass" required placeholder="••••••••" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition text-sm">
+              </div>
+
+              <button type="submit" class="w-full py-3.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm transition shadow-lg shadow-brand-600/20">
+                إنشاء الحساب والبدء
+              </button>
+            </form>
+
+            <p class="text-center text-xs text-slate-500 mt-6">
+              لديك حساب بالفعل؟ <button onclick="navigateTo('login')" class="text-brand-600 font-bold hover:underline">تسجيل الدخول</button>
+            </p>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('registerForm').onsubmit = (e) => {
+        e.preventDefault();
+        const name = document.getElementById('regName').value.trim();
+        const email = document.getElementById('regEmail').value.trim();
+        
+        DB.user = { name: name, email: email, demoMode: false };
+        saveDB();
+        toast(`تم إنشاء حسابك بنجاح! أهلاً بك يا ${name}`);
+        navigateTo('dashboard');
+      };
+    }
+
+    function quickDemoLogin() {
+      DB.user = { name: 'طالب الدحيح', email: 'demo@eldaheeh.app', demoMode: true };
+      saveDB();
+      toast('تم الدخول بنجاح في الوضع التجريبي');
+      navigateTo('dashboard');
+    }
+
+    /* =========================================================
+       3. View: Dashboard
+       ========================================================= */
+    function renderDashboardView(container) {
+      const todayISO = getTodayISO();
+      
+      const totalTasks = DB.tasks.length;
+      const completedTasks = DB.tasks.filter(t => t.status === 'done').length;
+      const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+      const todaySessions = DB.sessions.filter(s => s.date === todayISO);
+      const upcomingExams = DB.events.filter(e => e.date >= todayISO).sort((a,b) => a.date.localeCompare(b.date));
+      const pendingTasks = DB.tasks.filter(t => t.status !== 'done').sort((a,b) => a.due.localeCompare(b.due));
+
+      const innerHTML = `
+        <div class="space-y-6">
+          
+          <!-- Welcome Banner -->
+          <div class="bg-gradient-to-r from-brand-800 via-brand-700 to-brand-600 text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+            <div class="relative z-10 space-y-2">
+              <span class="inline-block px-3 py-1 rounded-full bg-white/10 text-brand-100 text-xs font-bold">
+                📅 ${formatDateAr(todayISO)}
+              </span>
+              <h2 class="text-2xl sm:text-3xl font-black">أهلاً بك، ${escapeHTML(DB.user.name)} 👋</h2>
+              <p class="text-brand-100 text-sm max-w-xl">
+                لوحة التحكم فارغة وجاهزة لك. يمكنك الآن البدء بإضافة المواد والواجبات وجدول مذاكرتك الخاص!
+              </p>
+            </div>
+          </div>
+
+          <!-- Stats Grid -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+              <span class="text-xs font-bold text-slate-400 block mb-1">عدد المواد</span>
+              <div class="text-2xl font-black text-slate-800">${DB.subjects.length}</div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+              <span class="text-xs font-bold text-slate-400 block mb-1">مهام معلقة</span>
+              <div class="text-2xl font-black text-amber-600">${pendingTasks.length}</div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+              <span class="text-xs font-bold text-slate-400 block mb-1">مهام مكتملة</span>
+              <div class="text-2xl font-black text-emerald-600">${completedTasks}</div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+              <span class="text-xs font-bold text-slate-400 block mb-1">نسبة الإنجاز</span>
+              <div class="text-2xl font-black text-brand-600">${completionRate}%</div>
+            </div>
+          </div>
+
+          <!-- Quick Action Banner -->
+          ${DB.subjects.length === 0 ? `
+            <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 text-center space-y-3">
+              <h3 class="font-bold text-emerald-900 text-lg">💡 ابدأ خطواتك الأولى</h3>
+              <p class="text-sm text-emerald-700 max-w-lg mx-auto">لم تقم بإضافة أي مادة دراسية بعد. أضف موادك أولاً لتتمكن من إضافة الواجبات وجلسات المذاكرة المرتبطة بها.</p>
+              <button onclick="navigateTo('subjects')" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition">
+                + إضافة أول مادة دراسية
+              </button>
+            </div>
+          ` : ''}
+
+          <!-- Content Columns -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Today's Study Sessions -->
+            <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2">
+                  <span>⏱️</span> جلسات مذاكرة اليوم
+                </h3>
+                <button onclick="navigateTo('schedule')" class="text-xs font-bold text-brand-600 hover:underline">إدارة الجلسات</button>
+              </div>
+
+              <div class="space-y-3">
+                ${todaySessions.length === 0 ? `
+                  <div class="text-center py-8 text-slate-400 text-sm space-y-2">
+                    <p>لا توجد جلسات مذاكرة لليوم</p>
+                    <button onclick="navigateTo('schedule')" class="text-xs text-brand-600 font-bold hover:underline">+ أضف جلسة في الجدول</button>
+                  </div>
+                ` : todaySessions.map(s => {
+                  const sub = getSubject(s.subjectId);
+                  return `
+                    <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+                      <div class="flex items-center gap-3">
+                        <span class="w-3 h-3 rounded-full" style="background-color: ${sub.color}"></span>
+                        <div>
+                          <div class="font-bold text-slate-800 text-sm">${escapeHTML(s.title)}</div>
+                          <div class="text-xs text-slate-500">${escapeHTML(sub.name)} · ${s.start} - ${s.end}</div>
+                        </div>
+                      </div>
+                      <input type="checkbox" ${s.done ? 'checked' : ''} onchange="toggleSessionDone('${s.id}')" class="w-5 h-5 rounded text-brand-600 focus:ring-brand-500 cursor-pointer">
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+
+            <!-- Upcoming Tasks -->
+            <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2">
+                  <span>✏️</span> الواجبات القادمة
+                </h3>
+                <button onclick="navigateTo('tasks')" class="text-xs font-bold text-brand-600 hover:underline">إدارة المهام</button>
+              </div>
+
+              <div class="space-y-3">
+                ${pendingTasks.length === 0 ? `
+                  <div class="text-center py-8 text-slate-400 text-sm space-y-2">
+                    <p>لا توجد واجبات قادمة معلقة</p>
+                    <button onclick="navigateTo('tasks')" class="text-xs text-brand-600 font-bold hover:underline">+ أضف مهمة جديدة</button>
+                  </div>
+                ` : pendingTasks.slice(0, 4).map(t => {
+                  const sub = getSubject(t.subjectId);
+                  const isOverdue = t.due < todayISO;
+                  return `
+                    <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+                      <div class="flex items-center gap-3">
+                        <input type="checkbox" ${t.status === 'done' ? 'checked' : ''} onchange="toggleTaskDone('${t.id}')" class="w-5 h-5 rounded text-brand-600 focus:ring-brand-500 cursor-pointer">
+                        <div>
+                          <div class="font-bold text-slate-800 text-sm ${t.status === 'done' ? 'line-through text-slate-400' : ''}">${escapeHTML(t.title)}</div>
+                          <div class="text-xs text-slate-500">
+                            ${escapeHTML(sub.name)} · 
+                            <span class="${isOverdue ? 'text-rose-600 font-bold' : ''}">التسليم: ${formatShortDate(t.due)}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <span class="text-xs font-bold px-2 py-0.5 rounded-full ${t.priority === 'high' ? 'bg-rose-100 text-rose-700' : 'bg-slate-200 text-slate-700'}">
+                        ${t.priority === 'high' ? 'عالية' : 'عادية'}
+                      </span>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Upcoming Exams / Events -->
+          <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2">
+                <span>📝</span> الاختبارات والامتحانات القادمة
+              </h3>
+              <button onclick="navigateTo('calendar')" class="text-xs font-bold text-brand-600 hover:underline">عرض التقويم</button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              ${upcomingExams.length === 0 ? `
+                <div class="col-span-full text-center py-6 text-slate-400 text-sm">لا توجد امتحانات مسجلة حالياً</div>
+              ` : upcomingExams.map(e => {
+                const sub = getSubject(e.subjectId);
+                return `
+                  <div class="p-4 rounded-xl border border-rose-100 bg-rose-50/50 space-y-1">
+                    <span class="text-xs font-bold text-rose-600 block">${formatDateAr(e.date)}</span>
+                    <h4 class="font-bold text-slate-800 text-sm">${escapeHTML(e.title)}</h4>
+                    <span class="text-xs text-slate-500 block">${escapeHTML(sub.name)}</span>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+
+        </div>
+      `;
+
+      container.innerHTML = renderAppShell(innerHTML);
+    }
+
+    /* =========================================================
+       4. View: Subjects Management
+       ========================================================= */
+    function renderSubjectsView(container) {
+      const innerHTML = `
+        <div class="space-y-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-2xl font-black text-slate-900">المواد الدراسية</h2>
+              <p class="text-slate-500 text-xs sm:text-sm mt-0.5">إدارة ومتابعة المقررات الدراسية الخاصة بك</p>
+            </div>
+            <button onclick="openSubjectModal()" class="px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm transition shadow-md shadow-brand-600/20 flex items-center gap-2">
+              <span>+</span> إضافة مادة جديدة
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            ${DB.subjects.length === 0 ? `
+              <div class="col-span-full bg-white p-12 rounded-2xl text-center text-slate-400 space-y-3 border border-slate-100">
+                <div class="text-5xl">📚</div>
+                <p class="font-bold text-slate-700 text-base">لا توجد مواد دراسية مضافة حتى الآن</p>
+                <p class="text-xs text-slate-500 max-w-sm mx-auto">ابدأ بإنشاء مادتك الأولى مثل (الرياضيات، الفيزياء، التاريخ...) لتتمكن من تنظيم المهام والجدول.</p>
+                <button onclick="openSubjectModal()" class="px-5 py-2.5 rounded-xl bg-brand-600 text-white font-bold text-xs shadow-md">أضف أول مادة دراسية الآن</button>
+              </div>
+            ` : DB.subjects.map(s => {
+              const subTasks = DB.tasks.filter(t => t.subjectId === s.id);
+              const completedTasks = subTasks.filter(t => t.status === 'done').length;
+              const prog = subTasks.length > 0 ? Math.round((completedTasks / subTasks.length) * 100) : 0;
+
+              return `
+                <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col">
+                  <div class="h-3" style="background-color: ${s.color}"></div>
+                  <div class="p-5 space-y-4 flex-1 flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between mb-1">
+                        <h3 class="font-bold text-lg text-slate-800">${escapeHTML(s.name)}</h3>
+                        <div class="flex items-center gap-1">
+                          <button onclick="openSubjectModal('${s.id}')" class="p-1 text-slate-400 hover:text-brand-600 transition">✏️</button>
+                          <button onclick="deleteSubject('${s.id}')" class="p-1 text-slate-400 hover:text-rose-600 transition">🗑️</button>
+                        </div>
+                      </div>
+                      ${s.teacher ? `<p class="text-xs font-bold text-slate-500 mb-2">👨‍🏫 ${escapeHTML(s.teacher)}</p>` : ''}
+                      ${s.lectures ? `<p class="text-xs text-slate-500 bg-slate-50 p-2 rounded-lg border border-slate-100 mb-3">📍 ${escapeHTML(s.lectures)}</p>` : ''}
+                      ${s.notes ? `<p class="text-xs text-slate-600 leading-relaxed">${escapeHTML(s.notes)}</p>` : ''}
+                    </div>
+
+                    <div class="pt-4 border-t border-slate-100 space-y-2">
+                      <div class="flex justify-between text-xs font-bold text-slate-500">
+                        <span>المهام المكتملة (${completedTasks}/${subTasks.length})</span>
+                        <span>${prog}%</span>
+                      </div>
+                      <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-full rounded-full" style="width: ${prog}%; background-color: ${s.color}"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+
+      container.innerHTML = renderAppShell(innerHTML);
+    }
+
+    function openSubjectModal(subjectId = null) {
+      const subject = DB.subjects.find(s => s.id === subjectId) || {};
+      const isEdit = !!subjectId;
+
+      const colors = ['#0d9488', '#6366f1', '#f59e0b', '#ec4899', '#8b5cf6', '#10b981', '#ef4444'];
+
+      const bodyHTML = `
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">اسم المادة *</label>
+          <input type="text" id="subModalName" required value="${escapeHTML(subject.name || '')}" placeholder="مثال: الرياضيات المتقدمة" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-brand-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">اسم المدرس / الأستاذ</label>
+          <input type="text" id="subModalTeacher" value="${escapeHTML(subject.teacher || '')}" placeholder="د. أحمد" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-brand-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">مواعيد المحاضرات</label>
+          <input type="text" id="subModalLectures" value="${escapeHTML(subject.lectures || '')}" placeholder="الأحد والأربعاء الساعة 10 صباحاً" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-brand-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">لون المادة المميز</label>
+          <div class="flex items-center gap-3 pt-1">
+            ${colors.map(c => `
+              <label class="cursor-pointer">
+                <input type="radio" name="subColor" value="${c}" ${ (subject.color || colors[0]) === c ? 'checked' : '' } class="peer sr-only">
+                <span class="w-7 h-7 rounded-full block border-2 border-transparent peer-checked:border-slate-800 peer-checked:scale-110 transition" style="background-color: ${c}"></span>
+              </label>
+            `).join('')}
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">ملاحظات عن المادة</label>
+          <textarea id="subModalNotes" rows="2" placeholder="أي ملاحظات أو رابط المنهج..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-brand-500">${escapeHTML(subject.notes || '')}</textarea>
+        </div>
+      `;
+
+      openModal(isEdit ? 'تعديل المادة الدراسية' : 'إضافة مادة دراسية جديدة', bodyHTML, () => {
+        const name = document.getElementById('subModalName').value.trim();
+        if (!name) {
+          toast('يرجى إدخال اسم المادة', 'error');
+          return false;
+        }
+
+        const teacher = document.getElementById('subModalTeacher').value.trim();
+        const lectures = document.getElementById('subModalLectures').value.trim();
+        const color = document.querySelector('input[name="subColor"]:checked')?.value || colors[0];
+        const notes = document.getElementById('subModalNotes').value.trim();
+
+        if (isEdit) {
+          Object.assign(subject, { name, teacher, lectures, color, notes });
+          toast('تم تعديل بيانات المادة بنجاح');
+        } else {
+          DB.subjects.push({ id: uid(), name, teacher, lectures, color, notes });
+          toast('تمت إضافة المادة بنجاح');
+        }
+
+        saveDB();
+        renderSubjectsView(document.getElementById('app'));
+        return true;
+      });
+    }
+
+    function deleteSubject(id) {
+      confirmModal('هل أنت تأكد من حذف هذه المادة؟', () => {
+        DB.subjects = DB.subjects.filter(s => s.id !== id);
+        saveDB();
+        toast('تم حذف المادة بنجاح');
+        renderSubjectsView(document.getElementById('app'));
+      });
+    }
+
+    /* =========================================================
+       5. View: Tasks Management
+       ========================================================= */
+    let taskFilter = { search: '', subject: '', status: '' };
+
+    function renderTasksView(container) {
+      const filteredTasks = DB.tasks.filter(t => {
+        const matchSearch = t.title.toLowerCase().includes(taskFilter.search.toLowerCase());
+        const matchSubject = !taskFilter.subject || t.subjectId === taskFilter.subject;
+        const matchStatus = !taskFilter.status || t.status === taskFilter.status;
+        return matchSearch && matchSubject && matchStatus;
+      });
+
+      const innerHTML = `
+        <div class="space-y-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-2xl font-black text-slate-900">المهام والواجبات</h2>
+              <p class="text-slate-500 text-xs sm:text-sm mt-0.5">جدول متابعة وتسليم الواجبات والتكاليف</p>
+            </div>
+            <button onclick="openTaskModal()" class="px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm transition shadow-md shadow-brand-600/20 flex items-center gap-2">
+              <span>+</span> إضافة مهمة جديد
+            </button>
+          </div>
+
+          <!-- Filters Bar -->
+          <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <input type="text" placeholder="🔍 بحث عن مهمة..." value="${escapeHTML(taskFilter.search)}" oninput="taskFilter.search = this.value; renderTasksView(document.getElementById('app'))" class="px-3.5 py-2 rounded-xl border border-slate-200 text-sm outline-none focus:border-brand-500">
+            
+            <select onchange="taskFilter.subject = this.value; renderTasksView(document.getElementById('app'))" class="px-3.5 py-2 rounded-xl border border-slate-200 text-sm outline-none focus:border-brand-500 text-slate-700 font-semibold">
+              <option value="">جميع المواد الدراسية</option>
+              ${DB.subjects.map(s => `<option value="${s.id}" ${taskFilter.subject === s.id ? 'selected' : ''}>${escapeHTML(s.name)}</option>`).join('')}
+            </select>
+
+            <select onchange="taskFilter.status = this.value; renderTasksView(document.getElementById('app'))" class="px-3.5 py-2 rounded-xl border border-slate-200 text-sm outline-none focus:border-brand-500 text-slate-700 font-semibold">
+              <option value="">جميع الحالات</option>
+              <option value="todo" ${taskFilter.status === 'todo' ? 'selected' : ''}>لم تبدأ</option>
+              <option value="doing" ${taskFilter.status === 'doing' ? 'selected' : ''}>قيد التنفيذ</option>
+              <option value="done" ${taskFilter.status === 'done' ? 'selected' : ''}>مكتملة</option>
+            </select>
+          </div>
+
+          <!-- Tasks List -->
+          <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden divide-y divide-slate-100">
+            ${filteredTasks.length === 0 ? `
+              <div class="p-12 text-center text-slate-400 space-y-2">
+                <div class="text-4xl">📋</div>
+                <p class="font-bold text-slate-600">لا توجد مهام حالياً</p>
+                <p class="text-xs text-slate-400">أضف واجباتك وتكاليفك الدراسية لتصل إليها بسهولة.</p>
+              </div>
+            ` : filteredTasks.map(t => {
+              const sub = getSubject(t.subjectId);
+              const isOverdue = t.due < getTodayISO() && t.status !== 'done';
+
+              return `
+                <div class="p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-slate-50/80 transition">
+                  <div class="flex items-start gap-3.5">
+                    <input type="checkbox" ${t.status === 'done' ? 'checked' : ''} onchange="toggleTaskDone('${t.id}')" class="mt-1 w-5 h-5 rounded text-brand-600 focus:ring-brand-500 cursor-pointer">
+                    <div>
+                      <div class="flex items-center gap-2">
+                        <h4 class="font-bold text-slate-800 text-base ${t.status === 'done' ? 'line-through text-slate-400' : ''}">${escapeHTML(t.title)}</h4>
+                        <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${sub.color}"></span>
+                        <span class="text-xs text-slate-500 font-semibold">${escapeHTML(sub.name)}</span>
+                      </div>
+                      ${t.desc ? `<p class="text-xs text-slate-500 mt-1">${escapeHTML(t.desc)}</p>` : ''}
+                      <div class="flex items-center gap-3 mt-2 text-xs text-slate-400">
+                        <span class="${isOverdue ? 'text-rose-600 font-bold' : ''}">
+                          📅 التسليم: ${formatDateAr(t.due)}
+                        </span>
+                        <span>·</span>
+                        <span class="font-bold ${t.priority === 'high' ? 'text-rose-600' : 'text-slate-500'}">أولوية: ${t.priority === 'high' ? 'عالية' : 'عادية'}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center gap-2 self-end sm:self-center">
+                    <select onchange="updateTaskStatus('${t.id}', this.value)" class="text-xs font-bold px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white">
+                      <option value="todo" ${t.status === 'todo' ? 'selected' : ''}>لم تبدأ</option>
+                      <option value="doing" ${t.status === 'doing' ? 'selected' : ''}>قيد التنفيذ</option>
+                      <option value="done" ${t.status === 'done' ? 'selected' : ''}>مكتملة</option>
+                    </select>
+                    <button onclick="openTaskModal('${t.id}')" class="p-1.5 text-slate-400 hover:text-brand-600">✏️</button>
+                    <button onclick="deleteTask('${t.id}')" class="p-1.5 text-slate-400 hover:text-rose-600">🗑️</button>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+
+      container.innerHTML = renderAppShell(innerHTML);
+    }
+
+    function openTaskModal(taskId = null) {
+      if (DB.subjects.length === 0) {
+        toast('يرجى إضافة مادة دراسية أولاً قبل إدخال المهام', 'error');
+        navigateTo('subjects');
+        return;
+      }
+
+      const task = DB.tasks.find(t => t.id === taskId) || {};
+      const isEdit = !!taskId;
+
+      const bodyHTML = `
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">عنوان المهمة / الواجب *</label>
+          <input type="text" id="taskModalTitle" required value="${escapeHTML(task.title || '')}" placeholder="مثال: حل واجب الفصل الأول" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-brand-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">المادة الدراسية *</label>
+          <select id="taskModalSubject" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-brand-500">
+            ${DB.subjects.map(s => `<option value="${s.id}" ${task.subjectId === s.id ? 'selected' : ''}>${escapeHTML(s.name)}</option>`).join('')}
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">تاريخ التسليم *</label>
+            <input type="date" id="taskModalDue" required value="${task.due || getTodayISO()}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-brand-500">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">الأولوية</label>
+            <select id="taskModalPriority" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-brand-500">
+              <option value="low" ${task.priority === 'low' ? 'selected' : ''}>منخفضة</option>
+              <option value="med" ${task.priority === 'med' || !task.priority ? 'selected' : ''}>متوسطة</option>
+              <option value="high" ${task.priority === 'high' ? 'selected' : ''}>عالية</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">الوصف التفصيلي</label>
+          <textarea id="taskModalDesc" rows="2" placeholder="أي تفاصيل إضافية عن الواجب..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-brand-500">${escapeHTML(task.desc || '')}</textarea>
+        </div>
+      `;
+
+      openModal(isEdit ? 'تعديل المهمة' : 'إضافة مهمة جديدة', bodyHTML, () => {
+        const title = document.getElementById('taskModalTitle').value.trim();
+        const subjectId = document.getElementById('taskModalSubject').value;
+        const due = document.getElementById('taskModalDue').value;
+        const priority = document.getElementById('taskModalPriority').value;
+        const desc = document.getElementById('taskModalDesc').value.trim();
+
+        if (!title || !subjectId || !due) {
+          toast('يرجى ملء جميع الحقول المطلوبة', 'error');
+          return false;
+        }
+
+        if (isEdit) {
+          Object.assign(task, { title, subjectId, due, priority, desc });
+          toast('تم تعديل المهمة بنجاح');
+        } else {
+          DB.tasks.push({
+            id: uid(),
+            title,
+            subjectId,
+            due,
+            priority,
+            desc,
+            status: 'todo',
+            createdAt: new Date().toISOString()
+          });
+          toast('تمت إضافة المهمة بنجاح');
+        }
+
+        saveDB();
+        renderTasksView(document.getElementById('app'));
+        return true;
+      });
+    }
+
+    function toggleTaskDone(id) {
+      const task = DB.tasks.find(t => t.id === id);
+      if (task) {
+        task.status = task.status === 'done' ? 'todo' : 'done';
+        saveDB();
+        toast(task.status === 'done' ? 'ممتاز! تم إنجاز المهمة 🎉' : 'تم إعادة فتح المهمة');
+        navigateTo(currentView);
+      }
+    }
+
+    function updateTaskStatus(id, newStatus) {
+      const task = DB.tasks.find(t => t.id === id);
+      if (task) {
+        task.status = newStatus;
+        saveDB();
+        toast('تم تحديث حالة المهمة');
+        navigateTo(currentView);
+      }
+    }
+
+    function deleteTask(id) {
+      confirmModal('هل أنت تأكد من حذف هذه المهمة؟', () => {
+        DB.tasks = DB.tasks.filter(t => t.id !== id);
+        saveDB();
+        toast('تم حذف المهمة بنجاح');
+        renderTasksView(document.getElementById('app'));
+      });
+    }
+
+    /* =========================================================
+       6. View: Schedule
+       ========================================================= */
+    function renderScheduleView(container) {
+      const innerHTML = `
+        <div class="space-y-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-2xl font-black text-slate-900">جدول المذاكرة اليومي</h2>
+              <p class="text-slate-500 text-xs sm:text-sm mt-0.5">تخفيض التشتت وتحديد أوقات المذاكرة المركزة</p>
+            </div>
+            <button onclick="openSessionModal()" class="px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm transition shadow-md shadow-brand-600/20 flex items-center gap-2">
+              <span>+</span> إضافة جلسة مذاكرة
+            </button>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-4">
+            <h3 class="font-bold text-slate-800 text-lg border-b border-slate-100 pb-3">جلسات المذاكرة المسجلة</h3>
+            
+            <div class="space-y-3">
+              ${DB.sessions.length === 0 ? `
+                <div class="text-center py-10 text-slate-400 text-sm space-y-2">
+                  <div class="text-3xl">⏱️</div>
+                  <p class="font-bold text-slate-600">لا توجد جلسات مذاكرة حتى الآن</p>
+                  <p class="text-xs text-slate-400">نظّم وقتك وأضف الجلسات التي تود دراستها اليوم.</p>
+                </div>
+              ` : DB.sessions.map(s => {
+                const sub = getSubject(s.subjectId);
+                return `
+                  <div class="p-4 rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                      <input type="checkbox" ${s.done ? 'checked' : ''} onchange="toggleSessionDone('${s.id}')" class="w-5 h-5 rounded text-brand-600 focus:ring-brand-500 cursor-pointer">
+                      <div>
+                        <div class="flex items-center gap-2">
+                          <h4 class="font-bold text-slate-800 text-sm ${s.done ? 'line-through text-slate-400' : ''}">${escapeHTML(s.title)}</h4>
+                          <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${sub.color}"></span>
+                          <span class="text-xs text-slate-500 font-semibold">${escapeHTML(sub.name)}</span>
+                        </div>
+                        <div class="text-xs text-slate-400 mt-0.5">📅 ${formatDateAr(s.date)} · ⏱️ ${s.start} إلى ${s.end}</div>
+                      </div>
+                    </div>
+
+                    <button onclick="deleteSession('${s.id}')" class="text-xs text-rose-600 hover:underline font-bold">حذف</button>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+
+      container.innerHTML = renderAppShell(innerHTML);
+    }
+
+    function openSessionModal() {
+      if (DB.subjects.length === 0) {
+        toast('يرجى إضافة مادة دراسية واحدة على الأقل أولاً', 'error');
+        navigateTo('subjects');
+        return;
+      }
+
+      const bodyHTML = `
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">عنوان الجلسة *</label>
+          <input type="text" id="sesModalTitle" required placeholder="مثال: مراجعة الفصل الأول" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-brand-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">المادة الدراسية *</label>
+          <select id="sesModalSubject" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-brand-500">
+            ${DB.subjects.map(s => `<option value="${s.id}">${escapeHTML(s.name)}</option>`).join('')}
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">تاريخ الجلسة *</label>
+          <input type="date" id="sesModalDate" value="${getTodayISO()}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-brand-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">وقت البداية *</label>
+            <input type="time" id="sesModalStart" value="16:00" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-brand-500">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">وقت النهاية *</label>
+            <input type="time" id="sesModalEnd" value="18:00" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-brand-500">
+          </div>
+        </div>
+      `;
+
+      openModal('إضافة جلسة مذاكرة جديدة', bodyHTML, () => {
+        const title = document.getElementById('sesModalTitle').value.trim();
+        const subjectId = document.getElementById('sesModalSubject').value;
+        const date = document.getElementById('sesModalDate').value;
+        const start = document.getElementById('sesModalStart').value;
+        const end = document.getElementById('sesModalEnd').value;
+
+        if (!title || !date || !start || !end) {
+          toast('يرجى ملء كافة تفاصيل الجلسة', 'error');
+          return false;
+        }
+
+        DB.sessions.push({ id: uid(), title, subjectId, date, start, end, done: false });
+        saveDB();
+        toast('تم إضافة الجلسة بنجاح إلى جدولك');
+        renderScheduleView(document.getElementById('app'));
+        return true;
+      });
+    }
+
+    function toggleSessionDone(id) {
+      const ses = DB.sessions.find(s => s.id === id);
+      if (ses) {
+        ses.done = !ses.done;
+        saveDB();
+        toast(ses.done ? 'عاشت أيدك! أكملت هذه الجلسة' : 'تم إعادة تعيين الجلسة');
+        navigateTo(currentView);
+      }
+    }
+
+    function deleteSession(id) {
+      DB.sessions = DB.sessions.filter(s => s.id !== id);
+      saveDB();
+      toast('تم حذف الجلسة');
+      renderScheduleView(document.getElementById('app'));
+    }
+
+    /* =========================================================
+       7. View: Calendar
+       ========================================================= */
+    function renderCalendarView(container) {
+      const innerHTML = `
+        <div class="space-y-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-2xl font-black text-slate-900">التقويم الدراسي الأحداث</h2>
+              <p class="text-slate-500 text-xs sm:text-sm mt-0.5">تتبع مواعيد الاختبارات والواجبات الهامة</p>
+            </div>
+            <button onclick="openEventModal()" class="px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm transition shadow-md shadow-brand-600/20 flex items-center gap-2">
+              <span>+</span> إضافة حدث / امتحان
+            </button>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-4">
+            <h3 class="font-bold text-slate-800 text-lg border-b border-slate-100 pb-3">الأحداث والامتحانات القادمة</h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              ${DB.events.length === 0 ? `
+                <div class="col-span-full text-center py-10 text-slate-400 text-sm space-y-2">
+                  <div class="text-3xl">🗓️</div>
+                  <p class="font-bold text-slate-600">لا توجد امتحانات أو أحداث قادمة</p>
+                  <p class="text-xs text-slate-400">أضف امتحاناتك القادمة لتبقى على دراية بمواعيدها.</p>
+                </div>
+              ` : DB.events.map(e => {
+                const sub = getSubject(e.subjectId);
+                return `
+                  <div class="p-4 rounded-xl border border-slate-100 bg-slate-50 flex items-start justify-between">
+                    <div class="space-y-1">
+                      <span class="text-xs font-bold px-2 py-0.5 rounded-full ${e.type === 'exam' ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700'}">
+                        ${e.type === 'exam' ? 'امتحان رئيسي' : 'اختبار كويز'}
+                      </span>
+                      <h4 class="font-bold text-slate-800 text-sm mt-1">${escapeHTML(e.title)}</h4>
+                      <div class="text-xs text-slate-500">${escapeHTML(sub.name)} · 📅 ${formatDateAr(e.date)}</div>
+                      ${e.desc ? `<p class="text-xs text-slate-400 leading-relaxed">${escapeHTML(e.desc)}</p>` : ''}
+                    </div>
+
+                    <button onclick="deleteEvent('${e.id}')" class="text-xs text-rose-600 font-bold hover:underline">حذف</button>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+
+      container.innerHTML = renderAppShell(innerHTML);
+    }
+
+    function openEventModal() {
+      const bodyHTML = `
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">عنوان الحدث / الامتحان *</label>
+          <input type="text" id="evtModalTitle" required placeholder="امتحان منتصف الفصل" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-brand-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">نوع الحدث</label>
+          <select id="evtModalType" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-brand-500">
+            <option value="exam">امتحان رئيسي</option>
+            <option value="quiz">اختبار قصير (Quiz)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">المادة الدراسية</label>
+          <select id="evtModalSubject" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-brand-500">
+            <option value="">— بدون مادة —</option>
+            ${DB.subjects.map(s => `<option value="${s.id}">${escapeHTML(s.name)}</option>`).join('')}
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">التاريخ *</label>
+          <input type="date" id="evtModalDate" value="${getTodayISO()}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-brand-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">مكان الامتحان / تفاصيل</label>
+          <input type="text" id="evtModalDesc" placeholder="قاعة 4 بالمبنى الرئيسي" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-brand-500">
+        </div>
+      `;
+
+      openModal('إضافة حدث دراسي', bodyHTML, () => {
+        const title = document.getElementById('evtModalTitle').value.trim();
+        const type = document.getElementById('evtModalType').value;
+        const subjectId = document.getElementById('evtModalSubject').value;
+        const date = document.getElementById('evtModalDate').value;
+        const desc = document.getElementById('evtModalDesc').value.trim();
+
+        if (!title || !date) {
+          toast('يرجى ملء كافة الحقول المطلوبة', 'error');
+          return false;
+        }
+
+        DB.events.push({ id: uid(), title, type, subjectId, date, desc });
+        saveDB();
+        toast('تم تسجيل الحدث بنجاح');
+        renderCalendarView(document.getElementById('app'));
+        return true;
+      });
+    }
+
+    function deleteEvent(id) {
+      DB.events = DB.events.filter(e => e.id !== id);
+      saveDB();
+      toast('تم حذف الحدث');
+      renderCalendarView(document.getElementById('app'));
+    }
+
+    /* =========================================================
+       8. View: Dedicated AI Assistant (Strict Project Scope Chatbot)
+       ========================================================= */
+    let aiChatHistory = [
+      { sender: 'ai', text: 'أهلاً بك! أنا مساعد منصة «الدحيح» الذكي 🤖. أنا هنا لمساعدتك في شرح كيفية استخدام المنصة وإضافة المواد، الواجبات، وتنظيم جدول المذاكرة. كيف يمكنني مساعدتك اليوم؟' }
+    ];
+
+    function renderAIAssistantView(container) {
+      const innerHTML = `
+        <div class="space-y-4 max-w-4xl mx-auto">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-600 to-emerald-500 flex items-center justify-center text-white text-xl shadow-md">
+                🤖
+              </div>
+              <div>
+                <h2 class="text-xl font-black text-slate-900">مساعد الدحيح AI</h2>
+                <p class="text-xs text-slate-500">مساعدك الشخصي للتعرف على مميزات المنصة وطريقة الاستخدام</p>
+              </div>
+            </div>
+            <span class="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> متصل لمساعدتك
+            </span>
+          </div>
+
+          <!-- Quick Question Suggestions -->
+          <div class="flex items-center gap-2 overflow-x-auto pb-2 text-xs font-bold text-slate-600">
+            <span class="text-slate-400 whitespace-nowrap">أسئلة مقترحة:</span>
+            <button onclick="askAIQuestion('ما هي منصة الدحيح؟')" class="px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-brand-500 hover:text-brand-600 transition whitespace-nowrap">ما هي منصة الدحيح؟</button>
+            <button onclick="askAIQuestion('كيف أضيف مادة دراسية جديدة؟')" class="px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-brand-500 hover:text-brand-600 transition whitespace-nowrap">كيف أضيف مادة دراسية؟</button>
+            <button onclick="askAIQuestion('كيف أضيف مهمة أو واجب؟')" class="px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-brand-500 hover:text-brand-600 transition whitespace-nowrap">كيف أضيف واجب؟</button>
+            <button onclick="askAIQuestion('كيف أستفيد من التقويم وجدول المذاكرة؟')" class="px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-brand-500 hover:text-brand-600 transition whitespace-nowrap">كيف أنظم جدول المذاكرة؟</button>
+          </div>
+
+          <!-- Chat Window -->
+          <div class="bg-white rounded-2xl border border-slate-100 shadow-sm flex flex-col h-[520px]">
+            <!-- Messages Area -->
+            <div id="aiChatContainer" class="flex-1 p-4 sm:p-6 overflow-y-auto space-y-4">
+              ${aiChatHistory.map(msg => `
+                <div class="flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'} items-start gap-2.5">
+                  ${msg.sender === 'ai' ? `
+                    <div class="w-8 h-8 rounded-xl bg-brand-600 text-white flex items-center justify-center font-bold text-sm shrink-0">🤖</div>
+                  ` : ''}
+                  <div class="max-w-md rounded-2xl p-4 text-sm leading-relaxed ${msg.sender === 'user' ? 'bg-brand-600 text-white rounded-br-none font-medium' : 'bg-slate-100 text-slate-800 rounded-bl-none'}">
+                    ${escapeHTML(msg.text).replace(/\n/g, '<br>')}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+
+            <!-- Chat Input Bar -->
+            <form id="aiChatForm" class="p-3 border-t border-slate-100 flex items-center gap-2 bg-slate-50/50 rounded-b-2xl">
+              <input type="text" id="aiUserInput" placeholder="اسألني عن منصة الدحيح أو كيفية استخدام أي قسم..." class="flex-1 px-4 py-3 rounded-xl border border-slate-200 text-sm outline-none focus:border-brand-500 bg-white">
+              <button type="submit" class="px-5 py-3 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm transition shadow-md shadow-brand-600/20">
+                إرسال
+              </button>
+            </form>
+          </div>
+        </div>
+      `;
+
+      container.innerHTML = renderAppShell(innerHTML);
+
+      const chatContainer = document.getElementById('aiChatContainer');
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+
+      document.getElementById('aiChatForm').onsubmit = (e) => {
+        e.preventDefault();
+        const input = document.getElementById('aiUserInput');
+        const text = input.value.trim();
+        if (text) {
+          askAIQuestion(text);
+          input.value = '';
+        }
+      };
+    }
+
+    function askAIQuestion(userText) {
+      aiChatHistory.push({ sender: 'user', text: userText });
+      
+      // Strict scoped AI Response Logic
+      const reply = generateScopedAIResponse(userText);
+      
+      aiChatHistory.push({ sender: 'ai', text: reply });
+      renderAIAssistantView(document.getElementById('app'));
+    }
+
+    function generateScopedAIResponse(prompt) {
+      const p = prompt.toLowerCase();
+
+      // Check if prompt is out-of-scope (Not related to the website/project)
+      const isProjectRelated = p.includes('دحيح') || p.includes('منصة') || p.includes('مادة') || p.includes('مواد') ||
+                               p.includes('واجب') || p.includes('مهام') || p.includes('مهمة') || p.includes('جدول') ||
+                               p.includes('مذاكرة') || p.includes('تقويم') || p.includes('امتحان') || p.includes('تخزين') ||
+                               p.includes('حساب') || p.includes('إعدادات') || p.includes('كيف') || p.includes('أين') ||
+                               p.includes('مرحبا') || p.includes('أهلا') || p.includes('سلام') || p.includes('شرح') || p.includes('مساعدة');
+
+      // Out of scope handler
+      if (!isProjectRelated || p.includes('طبخ') || p.includes('كورة') || p.includes('سياسة') || p.includes('تاريخ') || p.includes('طقس') || p.includes('فيلم')) {
+        return "عذراً يا صديقي، أنا مساعد متخصص فقط في منصة «الدحيح» لتنظيم المذاكرة 🎓.\nيمكنني إجابتك حول كيفية إضافة المواد، المهام، جدول المذاكرة، التقويم وتصدير البيانات. كيف يمكنني مساعدتك في تنظيم وقت دراستك اليوم؟";
+      }
+
+      // Greetings
+      if (p.includes('مرحبا') || p.includes('أهلا') || p.includes('سلام') || p.includes('من انت')) {
+        return "أهلاً بك يا بطل! أنا مساعد منصة الدحيح الذكي 🤖. يسعدني توجيهك لكيفية الاستفادة الكاملة من الموقع وتنظيم موادك ومهامك الدراسية.";
+      }
+
+      // 1. What is Eldaheeh?
+      if (p.includes('ما هي') || p.includes('ما هو') || p.includes('تعريف') || p.includes('عن الموقع')) {
+        return "منصة «الدحيح» هي مساعدك الدراسي المتكامل المنظم في صفحة واحدة! تتيح لك:\n- إضافة ومتابعة موادك الدراسية وتحديد ألوانها.\n- إدخال الواجبات والتكاليف وتحديد أولوياتها.\n- تنظيم جدول مذاكرة بالساعة لتجنب التشتت.\n- تسجيل مواعيد الامتحانات والكويزات في التقويم.\n- حفظ بياناتك تلقائياً وبأمان في متصفحك الخاص (localStorage).";
+      }
+
+      // 2. Add Subject
+      if (p.includes('مادة') || p.includes('مواد') || p.includes('مقرر')) {
+        return "لإضافة مادة دراسية جديدة:\n1. توجه إلى قسم «المواد الدراسية» من القائمة الجانبية.\n2. اضغط على زر «+ إضافة مادة جديدة».\n3. اكتب اسم المادة، اسم المدرس، مواعيد المحاضرات واختر لوناً مميزاً للمادة.\n4. اضغط «حفظ». وستظهر المادة فوراً مع إمكانية ربط المهام بها!";
+      }
+
+      // 3. Add Task
+      if (p.includes('مهمة') || p.includes('واجب') || p.includes('تكليف') || p.includes('مهام')) {
+        return "لإدارة الواجبات والمهام:\n1. افتح قسم «المهام والواجبات».\n2. انقر على «+ إضافة مهمة جديدة».\n3. اختر المادة الدراسية، حدد عنوان الواجب وتاريخ التسليم والأولوية (عالية/منخفضة).\n4. عند إنهاء أي واجب، يمكنك الضغط على مربع الاختيار لتتحول لـ «مكتملة» وتزيد نسبة إنجازك 🏆!";
+      }
+
+      // 4. Schedule & Study Sessions
+      if (p.includes('جدول') || p.includes('جلسة') || p.includes('جلسات') || p.includes('وقت')) {
+        return "لتخفيض التشتت وتنظيم وقت المذاكرة اليومي:\n1. اذهب إلى قسم «جدول المذاكرة».\n2. اضغط على «+ إضافة جلسة مذاكرة».\n3. حدد المادة، تاريخ اليوم، ووقت البداية والنهاية.\n4. ستظهر الجلسة في لوحة التحكم الرئيسية لمتابعة إنجازك خطوة بخطوة.";
+      }
+
+      // 5. Calendar & Exams
+      if (p.includes('تقويم') || p.includes('امتحان') || p.includes('اختبار') || p.includes('كويز')) {
+        return "لمتابعة الامتحانات والاختبارات القادمة:\n1. توجه إلى قسم «التقويم الدراسي».\n2. انقر على «+ إضافة حدث / امتحان».\n3. حدد نوع الحدث (امتحان رئيسي أو كويز)، تاريخه ومكانه.\n4. سيعرض لك التقويم التواريخ الهامة لتستعد لها مبكراً!";
+      }
+
+      // 6. Data Storage & Settings
+      if (p.includes('تخزين') || p.includes('حفظ') || p.includes('مسح') || p.includes('بيانات') || p.includes('json')) {
+        return "معلومات تخزين البيانات 🔒:\n- كافة بياناتك تُحفظ تلقائياً في متصفحك عبر تقنية localStorage.\n- البيانات ملكك بالكامل وخاصة بجهازك.\n- يمكنك تصدير نسخة احتياطية بصيغة JSON أو مسح كافة البيانات من قسم «الإعدادات».";
+      }
+
+      // General fallback response within website scope
+      return "يمكنك الاستفادة من منصة «الدحيح» بسهولة عبر التنقل في القائمة الجانبية بين:\n1. المواد الدراسية\n2. المهام والواجبات\n3. جدول المذاكرة\n4. التقويم الدراسي\n\nهل تود معرفة تفاصيل خطوات إضافة مادة جديدة أو تسجيل واجب؟";
+    }
+
+    /* =========================================================
+       9. View: Settings
+       ========================================================= */
+    function renderSettingsView(container) {
+      const innerHTML = `
+        <div class="space-y-6 max-w-3xl">
+          <div>
+            <h2 class="text-2xl font-black text-slate-900">إعدادات الحساب والبيانات</h2>
+            <p class="text-slate-500 text-xs sm:text-sm mt-0.5">تخصيص الملف الشخصي واستخراج النسخ الاحتياطية</p>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-4">
+            <h3 class="font-bold text-slate-800 text-lg border-b border-slate-100 pb-3">الملف الشخصي</h3>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">اسم الطالب الظاهر</label>
+              <input type="text" id="setUserName" value="${escapeHTML(DB.user ? DB.user.name : '')}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-brand-500">
+            </div>
+
+            <button onclick="updateProfileName()" class="px-4 py-2 rounded-xl bg-brand-600 text-white font-bold text-xs">حفظ التغييرات</button>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-4">
+            <h3 class="font-bold text-slate-800 text-lg border-b border-slate-100 pb-3">إدارة البيانات التخزينية</h3>
+
+            <div class="flex flex-wrap items-center gap-3">
+              <button onclick="exportJSONData()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs transition">
+                📥 تصدير النسخة الاحتياطية (JSON)
+              </button>
+              
+              <button onclick="resetAllAppData()" class="px-4 py-2.5 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 font-bold text-xs transition">
+                🗑️ مسح كافة بيانات التطبيق
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      container.innerHTML = renderAppShell(innerHTML);
+    }
+
+    function updateProfileName() {
+      const name = document.getElementById('setUserName').value.trim();
+      if (name && DB.user) {
+        DB.user.name = name;
+        saveDB();
+        toast('تم تحديث الاسم بنجاح');
+        navigateTo('settings');
+      }
+    }
+
+    function exportJSONData() {
+      const jsonStr = JSON.stringify(DB, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `eldaheeh_backup_${getTodayISO()}.json`;
+      a.click();
+      toast('تم تحميل ملف النسخة الاحتياطية');
+    }
+
+    function resetAllAppData() {
+      confirmModal('هل أنت متأكد من مسح جميع بياناتك بما في ذلك المواد والواجبات؟', () => {
+        localStorage.removeItem(DB_KEY);
+        DB = {
+          user: null,
+          subjects: [],
+          tasks: [],
+          sessions: [],
+          events: [],
+          settings: { studyHours: 3 }
+        };
+        toast('تم مسح جميع البيانات بنجاح');
+        navigateTo('home');
+      });
+    }
+
+    /* =========================================================
+       Application Initializer
+       ========================================================= */
+    window.onload = function() {
+      document.getElementById('currentYear').textContent = new Date().getFullYear();
+      loadDB();
+      
+      // Auto routing depending on login state
+      if (DB.user) {
+        navigateTo('dashboard');
+      } else {
+        navigateTo('home');
+      }
+    };
+  </script>
+</body>
+</html>
